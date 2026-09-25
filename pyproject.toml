@@ -10,11 +10,9 @@ dependencies = [
     "torchvision>=0.17",
     "numpy>=1.26",
     "flask>=3.0",
-    "flask-cors>=4.0",
     "h5py>=3.10",
     "peptidebuilder>=1.1",
     "biopython>=1.83",
-    "requests>=2.31",
 ]
 
 [dependency-groups]

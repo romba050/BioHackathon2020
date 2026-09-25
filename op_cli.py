@@ -7,8 +7,9 @@ For license information, please see the LICENSE file in the root directory.
 import argparse
 import importlib
 import sys
+import time
 import torch
-from dashboard import start_dashboard_server
+import dashboard
 
 from util import write_out
 
@@ -33,6 +34,10 @@ def main():
                         default=8, help='Size of each minibatch.')
     parser.add_argument('--experiment-id', dest='experiment_id', type=str,
                         default="example", help='Which experiment to run.')
+    parser.add_argument('--dashboard-port', dest='dashboard_port', type=int,
+                        default=dashboard.DEFAULT_PORT,
+                        help='Port for the live dashboard. If it is taken, a free '
+                             'port is chosen automatically.')
     args, _ = parser.parse_known_args()
 
     if args.hide_ui:
@@ -44,9 +49,22 @@ def main():
         write_out("Error: --use-gpu was set, but no GPU is available.")
         sys.exit(1)
 
+    dashboard_url = None
     if not args.hide_ui:
-        # start web server
-        start_dashboard_server()
+        dashboard_url = dashboard.start_dashboard_server(args.dashboard_port)
+        write_out("Live dashboard available at", dashboard_url)
+        if not dashboard.dashboard_is_built():
+            write_out("Dashboard frontend is not built yet. To build it, run:",
+                      dashboard.BUILD_INSTRUCTIONS)
 
     experiment = importlib.import_module("experiments." + args.experiment_id)
     experiment.run_experiment(parser, use_gpu)
+
+    if dashboard_url is not None:
+        write_out("Training finished. The dashboard stays available at", dashboard_url,
+                  "until you press Ctrl-C.")
+        try:
+            while True:
+                time.sleep(1)
+        except KeyboardInterrupt:
+            pass

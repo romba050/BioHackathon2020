@@ -5,9 +5,10 @@ import * as $ from 'jquery'
 import * as NGL from 'ngl'
 import * as React from 'react';
 
-// Where the OpenProtein training process serves its results. Override at
-// start time with REACT_APP_BACKEND_URL, e.g. when port 5000 is taken.
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || "http://localhost:5000/graph";
+// The training process serves this page and its data from the same origin.
+// During frontend development (`npm start`) the dev server proxies it to the
+// training process, see "proxy" in package.json.
+const BACKEND_URL = "/graph";
 
 interface IMetricsProbs {
     setPdbData: any;
