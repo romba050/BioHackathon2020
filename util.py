@@ -325,7 +325,7 @@ def calc_rmsd(chain_a, chain_b):
              + list(np.linalg.norm(x) ** 2 for x in Y.transpose()))
     TraceS = sum(S)
     RMSD = np.sqrt((1 / len(X.transpose())) * (E0 - 2 * TraceS))
-    return RMSD
+    return float(RMSD)
 
 
 def calc_angular_difference(values_1, values_2):
@@ -441,14 +441,15 @@ def pass_messages(aa_features, message_transformation, use_gpu):
 def load_model_from_disk(path, force_cpu=True):
     if force_cpu:
         # load model with map_location set to storage (main mem)
-        model = torch.load(path, map_location=lambda storage, loc: storage)
+        model = torch.load(path, map_location=lambda storage, loc: storage,
+                           weights_only=False)
         # flattern parameters in memory
         model.flatten_parameters()
         # update internal state accordingly
         model.use_gpu = False
     else:
         # load model using default map_location
-        model = torch.load(path)
+        model = torch.load(path, weights_only=False)
         model.flatten_parameters()
     return model
 

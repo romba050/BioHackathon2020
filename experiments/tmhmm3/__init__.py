@@ -4,6 +4,7 @@ This file is part of the OpenProtein project.
 For license information, please see the LICENSE file in the root directory.
 """
 import os
+import sys
 import pickle
 import hashlib
 from training import train_model
@@ -65,6 +66,7 @@ def run_experiment(parser, use_gpu):
         model_mode = TMHMM3Mode.LSTM_CRF_MARG
     else:
         print("ERROR: No model defined")
+        sys.exit(1)
 
     print("Using model:", model_mode)
 

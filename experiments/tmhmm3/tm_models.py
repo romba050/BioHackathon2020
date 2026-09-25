@@ -18,8 +18,8 @@ from experiments.tmhmm3.tm_util import get_predicted_type_from_labels
 from experiments.tmhmm3.tm_util import remapped_labels_hmm_to_orginal_labels
 from experiments.tmhmm3.tm_util import is_topologies_equal
 from experiments.tmhmm3.tm_util import original_labels_to_fasta
-from pytorchcrf.torchcrf import CRF
 from util import write_out, get_experiment_id
+from .crf import CRF
 
 # seed random generator for reproducibility
 torch.manual_seed(1)
@@ -275,10 +275,10 @@ class TMHMM3(openprotein.BaseModel):
         return emissions, batch_sizes
 
     def batch_sizes_to_mask(self, batch_sizes):
-        mask = torch.autograd.Variable(torch.t(torch.ByteTensor(
+        mask = torch.t(torch.tensor(
             [[1] * int(batch_size) + [0] * (int(batch_sizes[0])
-                                            - int(batch_size)) for batch_size in batch_sizes]
-        )))
+                                            - int(batch_size)) for batch_size in batch_sizes],
+            dtype=torch.bool))
         if self.use_gpu:
             mask = mask.cuda()
         return mask
@@ -313,7 +313,7 @@ class TMHMM3(openprotein.BaseModel):
             mask = mask_expand < batch_sizes.unsqueeze(1).expand_as(mask_expand)
             loss = (losses * mask.float()).sum() / batch_sizes.float().sum()
         else:
-            mask = (self.batch_sizes_to_mask(batch_sizes))
+            mask = self.batch_sizes_to_mask(batch_sizes)
             loss = -1 * self.crf_model(emissions, actual_labels, mask=mask) / minibatch_size
             if float(loss) > 100000: # if loss is this large, an invalid tx must have been found
                 for idx, batch_size in enumerate(batch_sizes):

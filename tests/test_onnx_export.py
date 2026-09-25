@@ -49,7 +49,8 @@ def test():
     path_to_onnx_file = './tests/output/openprotein.onnx'
     if os.path.exists(path_to_onnx_file):
         os.remove(path_to_onnx_file)
-    sub_process = subprocess.Popen(["pipenv", "run", "python", "./tests/onnx_export.py"])
+    env = {**os.environ, "PYTHONPATH": os.getcwd()}
+    sub_process = subprocess.Popen([sys.executable, "./tests/onnx_export.py"], env=env)
     stdout, stderr = sub_process.communicate()
     print(stdout, stderr)
     assert sub_process.returncode == 0

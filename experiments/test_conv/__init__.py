@@ -12,7 +12,7 @@ import openprotein
 from preprocessing import process_raw_data
 from training import train_model
 
-from util import get_backbone_positions_from_angles, contruct_dataloader_from_disk
+from util import contruct_dataloader_from_disk
 from util import calculate_dihedral_angles_over_minibatch, calc_angular_difference, \
     write_out, calculate_dihedral_angles, \
     get_structure_from_angles, write_to_pdb, calc_rmsd,\
@@ -61,7 +61,8 @@ class MyModel(openprotein.BaseModel):
         super(MyModel, self).__init__(use_gpu, embedding_size)
         self.use_gpu = use_gpu
         self.number_angles = 3
-        self.conv1= nn.Conv2d(in_channels=1, out_channels=3, kernel_size=(5, embedding_size), padding=(0,0))
+        self.conv1 = nn.Conv2d(in_channels=1, out_channels=3,
+                               kernel_size=(5, embedding_size), padding=(0, 0))
         self.conv2 = nn.Conv2d(in_channels=3, out_channels=6, kernel_size=(5, 1))
         self.deconv = nn.ConvTranspose2d(in_channels=6, out_channels=1, kernel_size=(9, 1))
         self.top_hidden = nn.Linear(1, 100)
@@ -85,4 +86,3 @@ class MyModel(openprotein.BaseModel):
         output_angles = torch.matmul(probabilities, ANGLE_ARR).transpose(0, 1)
 
         return output_angles, [], batch_sizes
-
