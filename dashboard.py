@@ -14,6 +14,7 @@ import logging
 import os
 import socket
 import threading
+import time
 
 import flask.cli
 from flask import Flask, jsonify, request, send_from_directory
@@ -98,4 +99,10 @@ def start_dashboard_server(preferred_port=DEFAULT_PORT):
     """Start serving the dashboard in the background and return its URL."""
     port = pick_port(preferred_port)
     GraphWebServer(port).start()
+    # Give the server a moment to bind so a browser opened right away connects.
+    for _ in range(50):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+            if sock.connect_ex(("127.0.0.1", port)) == 0:
+                break
+        time.sleep(0.1)
     return f"http://localhost:{port}/"

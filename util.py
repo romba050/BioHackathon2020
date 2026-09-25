@@ -71,14 +71,29 @@ def get_experiment_id():
     return globals().get("experiment_id")
 
 
-def write_out(*args, end='\n'):
+VERBOSE = True
+
+
+def set_verbose(verbose):
+    """Controls whether write_debug messages are printed (they are always logged)."""
+    global VERBOSE
+    VERBOSE = verbose
+
+
+def write_out(*args, end='\n', to_console=True):
     output_string = datetime.now().strftime('%Y-%m-%d %H:%M:%S') \
                     + ": " + str.join(" ", [str(a) for a in args]) + end
     if globals().get("experiment_id") is not None:
         with open("output/" + globals().get("experiment_id") + ".txt", "a+") as output_file:
             output_file.write(output_string)
             output_file.flush()
-    print(output_string, end="")
+    if to_console:
+        print(output_string, end="")
+
+
+def write_debug(*args, end='\n'):
+    """Per-minibatch detail such as timings. Hidden from the console with --silent."""
+    write_out(*args, end=end, to_console=VERBOSE)
 
 
 def write_model_to_disk(model):

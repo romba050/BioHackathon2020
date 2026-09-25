@@ -17,14 +17,16 @@ make dashboard  # builds the live dashboard frontend, only needed once (nothing 
 make run        # trains the sample experiment
 ```
 
-`make dashboard` only compiles the frontend; ignore the deployment hints it prints. The training process serves the dashboard itself. Training prints the URL as it starts, so open that in a browser to watch the model learn:
+`make dashboard` only compiles the frontend; ignore the deployment hints it prints. The training process serves the dashboard itself and opens it in your browser when it starts:
 
 ```
 $ make run
 ------------------------
 --- OpenProtein v0.1 ---
 ------------------------
-2026-09-25 18:02:10: Live dashboard available at http://localhost:5050/
+===========================================
+  Live dashboard: http://localhost:5050/  
+===========================================
 2026-09-25 18:02:10: Starting pre-processing of raw data...
 ...
 2026-09-25 18:02:11: Train loss: 1.8581191301345825
@@ -35,6 +37,8 @@ $ make run
 
 `make run` is just `uv run python __main__.py`. Useful flags:
 
+- `--silent` hides the per-minibatch timing lines; they still go to the experiment log in `output/`.
+- `--no-browser` prints the dashboard URL without opening it.
 - `--hide-ui` runs without the dashboard, for scripts and CI.
 - `--dashboard-port 8000` serves the dashboard on another port. If the port is taken, a free one is chosen automatically and printed.
 - `--help` lists all options, including those of the selected experiment.

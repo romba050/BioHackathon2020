@@ -8,7 +8,8 @@ import time
 import numpy as np
 import torch.optim as optim
 from dashboard import set_graph_data
-from util import set_experiment_id, write_out, write_model_to_disk, write_result_summary
+from util import set_experiment_id, write_out, write_debug, write_model_to_disk, \
+    write_result_summary
 
 
 
@@ -48,8 +49,8 @@ def train_model(data_set_identifier, model, train_loader, validation_loader,
             loss.backward()
             loss_tracker = np.append(loss_tracker, loss.item())
             end = time.time()
-            write_out("Loss time:", start_compute_grad - start_compute_loss, "Grad time:",
-                      end - start_compute_grad)
+            write_debug("Loss time:", start_compute_grad - start_compute_loss, "Grad time:",
+                        end - start_compute_grad)
             optimizer.step()
             optimizer.zero_grad()
             model.zero_grad()

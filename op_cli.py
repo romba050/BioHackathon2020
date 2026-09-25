@@ -8,17 +8,21 @@ import argparse
 import importlib
 import sys
 import time
+import webbrowser
 import torch
 import dashboard
 
-from util import write_out
+from util import write_out, set_verbose
 
 def main():
     parser = argparse.ArgumentParser(
         description="OpenProtein version 0.1",
         conflict_handler='resolve')
     parser.add_argument('--silent', dest='silent', action='store_true',
-                        help='Dont print verbose debug statements.')
+                        help='Hide per-minibatch timing output (it is still written to the '
+                             'experiment log in output/).')
+    parser.add_argument('--no-browser', dest='no_browser', action='store_true',
+                        default=False, help='Do not open the live dashboard in a browser.')
     parser.add_argument('--hide-ui', dest='hide_ui', action='store_true',
                         default=False, help='Hide loss graph and '
                                             'visualization UI while training goes on.')
@@ -40,6 +44,8 @@ def main():
                              'port is chosen automatically.')
     args, _ = parser.parse_known_args()
 
+    set_verbose(not args.silent)
+
     if args.hide_ui:
         write_out("Live plot deactivated, see output folder for plot.")
 
@@ -52,10 +58,15 @@ def main():
     dashboard_url = None
     if not args.hide_ui:
         dashboard_url = dashboard.start_dashboard_server(args.dashboard_port)
-        write_out("Live dashboard available at", dashboard_url)
+        banner = "  Live dashboard: " + dashboard_url + "  "
+        print("=" * len(banner))
+        print(banner)
+        print("=" * len(banner))
         if not dashboard.dashboard_is_built():
             write_out("Dashboard frontend is not built yet. To build it, run:",
                       dashboard.BUILD_INSTRUCTIONS)
+        elif not args.no_browser:
+            webbrowser.open(dashboard_url)
 
     experiment = importlib.import_module("experiments." + args.experiment_id)
     experiment.run_experiment(parser, use_gpu)

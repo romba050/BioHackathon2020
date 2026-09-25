@@ -8,7 +8,8 @@ import time
 import torch
 import torch.nn as nn
 from util import calculate_dihedral_angles_over_minibatch, calc_angular_difference, \
-    write_out, calculate_dihedral_angles, \
+    write_debug, \
+    calculate_dihedral_angles, \
     get_structure_from_angles, write_to_pdb, calc_rmsd,\
     calc_drmsd, get_backbone_positions_from_angles
 
@@ -47,7 +48,7 @@ class BaseModel(nn.Module):
             embed_tensor = embed_tensor.cuda()
 
         end = time.time()
-        write_out("Embed time:", end - start_compute_embed)
+        write_debug("Embed time:", end - start_compute_embed)
 
         return embed_tensor
 
@@ -69,7 +70,7 @@ class BaseModel(nn.Module):
         # drmsd_avg = calc_avg_drmsd_over_minibatch(backbone_atoms_padded,
         #                                           actual_coords_list_padded,
         #                                           batch_sizes)
-        write_out("Angle calculation time:", time.time() - start)
+        write_debug("Angle calculation time:", time.time() - start)
         if self.use_gpu:
             emissions_actual = emissions_actual.cuda()
             # drmsd_avg = drmsd_avg.cuda()
@@ -89,7 +90,7 @@ class BaseModel(nn.Module):
             primary_sequence, tertiary_positions, _mask = data
             start = time.time()
             predicted_angles, backbone_atoms, batch_sizes = self(primary_sequence)
-            write_out("Apply model to validation minibatch:", time.time() - start)
+            write_debug("Apply model to validation minibatch:", time.time() - start)
 
             if predicted_angles == []:
                 # model didn't provide angles, so we'll compute them here
@@ -131,7 +132,7 @@ class BaseModel(nn.Module):
                 loss += error
 
                 end = time.time()
-            write_out("Calculate validation loss for minibatch took:", end - start)
+            write_debug("Calculate validation loss for minibatch took:", end - start)
         loss = float(loss) / len(data_loader.dataset)
         self.historical_rmsd_avg_values.append(float(torch.Tensor(RMSD_list).mean()))
         self.historical_drmsd_avg_values.append(float(torch.Tensor(dRMSD_list).mean()))
