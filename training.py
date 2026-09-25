@@ -6,10 +6,10 @@ For license information, please see the LICENSE file in the root directory.
 
 import time
 import numpy as np
-import requests
 import torch.optim as optim
-from dashboard import DASHBOARD_URL
-from util import set_experiment_id, write_out, write_model_to_disk, write_result_summary
+from dashboard import set_graph_data
+from util import set_experiment_id, write_out, write_debug, write_model_to_disk, \
+    write_result_summary
 
 
 
@@ -49,8 +49,8 @@ def train_model(data_set_identifier, model, train_loader, validation_loader,
             loss.backward()
             loss_tracker = np.append(loss_tracker, loss.item())
             end = time.time()
-            write_out("Loss time:", start_compute_grad - start_compute_loss, "Grad time:",
-                      end - start_compute_grad)
+            write_debug("Loss time:", start_compute_grad - start_compute_loss, "Grad time:",
+                        end - start_compute_grad)
             optimizer.step()
             optimizer.zero_grad()
             model.zero_grad()
@@ -85,11 +85,7 @@ def train_model(data_set_identifier, model, train_loader, validation_loader,
                 json_data["validation_loss_values"] = validation_loss_values
 
                 if not hide_ui:
-                    write_out("Updating monitoring service:", str(json_data)
-                              if len(str(json_data)) < 50 else str(json_data)[:50]+"...")
-                    res = requests.post(DASHBOARD_URL, json=json_data, timeout=10)
-                    if res.ok:
-                        write_out("Received response from monitoring service:", res.json())
+                    set_graph_data(json_data)
 
                 if minibatches_proccesed > minimum_updates and minibatches_proccesed \
                         >= best_model_minibatch_time + minimum_updates:

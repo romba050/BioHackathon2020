@@ -4,26 +4,27 @@ A small React app that visualises an OpenProtein training run: the predicted and
 actual structure of a validation protein in 3D, training progress, and a
 Ramachandran plot of predicted versus actual dihedral angles.
 
-It polls the JSON endpoint that the training process serves (see `dashboard.py`
-in the repository root), by default `http://localhost:5000/graph`.
+The training process serves the built app together with its data, so for normal
+use you only need to build it once from the repository root:
 
-## Running
-
-```
-$ cd dashboard
-$ npm install
-$ npm start
+```bash
+make dashboard
 ```
 
-Then start training from the repository root without `--hide-ui` and open
-`http://localhost:3000/`.
+and then start training as usual. The URL is printed when training starts.
 
-If the training process is serving on a different port, point the dashboard at
-it with `REACT_APP_BACKEND_URL`:
+## Frontend development
 
+To work on the frontend with hot reloading, start training from the repository
+root, then run the dev server here:
+
+```bash
+npm start
 ```
-$ REACT_APP_BACKEND_URL=http://localhost:5050/graph npm start
-```
+
+It opens on port 3000 and proxies data requests to the training process on port
+5050 (see `proxy` in `package.json`). If training runs on another port, change
+that value.
 
 ## Origin
 

@@ -4,61 +4,53 @@ A PyTorch framework for tertiary protein structure prediction.
 
 ![Demo](demo.gif)
 
-
 ## Getting started
 
-This project uses [uv](https://docs.astral.sh/uv/) to manage its Python environment. After installing `uv`, clone the repository, install dependencies, and run the sample experiment:
+You need [uv](https://docs.astral.sh/uv/) for the Python side and Node.js for the dashboard frontend.
 
 ```bash
 git clone https://github.com/romba050/BioHackathon2020.git
 cd BioHackathon2020
-uv sync
-uv run python __main__.py
+make setup      # uv sync: installs Python 3.11/3.12 if needed and the pinned dependencies
+make dashboard  # builds the live dashboard frontend, only needed once (nothing starts yet)
+make run        # trains the sample experiment
 ```
 
-`uv sync` installs a compatible Python (3.11 or 3.12) if needed and creates a `.venv` with pinned dependencies from `uv.lock`. Use `--hide-ui` to skip the live dashboard server, or `--help` to see all options.
-
-The dashboard server listens on port 5000 by default. On recent macOS versions that port is taken by the AirPlay Receiver, so either disable it in System Settings or pick another port with `OPENPROTEIN_DASHBOARD_PORT=5050 uv run python __main__.py`.
-
-```bash
-uv run python __main__.py
-```
+`make dashboard` only compiles the frontend; ignore the deployment hints it prints. The training process serves the dashboard itself and opens it in your browser when it starts:
 
 ```
+$ make run
 ------------------------
 --- OpenProtein v0.1 ---
 ------------------------
-Live plot deactivated, see output folder for plot.
-Starting pre-processing of raw data...
-Preprocessed file for testing.txt already exists.
-force_pre_processing_overwrite flag set to True, overwriting old file...
-Processing raw data file testing.txt
-Wrote output to 81 proteins to data/preprocessed/testing.txt.hdf5
-Completed pre-processing.
-2018-09-27 19:27:34: Train loss: -781787.696391812
-2018-09-27 19:27:35: Loss time: 1.8300042152404785 Grad time: 0.5147676467895508
+===========================================
+  Live dashboard: http://localhost:5050/  
+===========================================
+2026-09-25 18:02:10: Starting pre-processing of raw data...
 ...
+2026-09-25 18:02:11: Train loss: 1.8581191301345825
+2026-09-25 18:02:11: Validation loss: 42.28535 Train loss: 1.8581191301345825
+...
+2026-09-25 18:02:14: Training finished. The dashboard stays available at http://localhost:5050/ until you press Ctrl-C.
 ```
+
+`make run` is just `uv run python __main__.py`. Useful flags:
+
+- `--silent` hides the per-minibatch timing lines; they still go to the experiment log in `output/`.
+- `--no-browser` prints the dashboard URL without opening it.
+- `--hide-ui` runs without the dashboard, for scripts and CI.
+- `--dashboard-port 8000` serves the dashboard on another port. If the port is taken, a free one is chosen automatically and printed.
+- `--help` lists all options, including those of the selected experiment.
 
 ## Live dashboard
 
 ![Alt text](examplemodelrun.png?raw=true "OpenProtein")
 
-The screenshot above shows the OpenProtein dashboard, a small React app in the [`dashboard/`](dashboard/) folder. It renders the predicted and actual structure of a validation protein in 3D, plots training progress, and draws a Ramachandran plot of predicted versus actual dihedral angles.
+The dashboard is a small React app in the [`dashboard/`](dashboard/) folder. It renders the predicted and actual structure of a validation protein in 3D, plots training progress, and draws a Ramachandran plot of predicted versus actual dihedral angles.
 
-While training runs, this project starts a Flask server (see `dashboard.py`) that exposes the latest evaluation results as JSON at `http://localhost:5000/graph`. The dashboard polls that endpoint every five seconds. To run it you need Node.js:
+The training process serves the built app and its data from the same port (see `dashboard.py`), so nothing needs to be configured. Training still works if the frontend has not been built; the URL then shows the build command instead, and the raw data stays available at `/graph`.
 
-```bash
-cd dashboard
-npm install
-npm start
-```
-
-Then start training from the repository root without `--hide-ui` and open `http://localhost:3000/`. If the training process serves on a different port (see the macOS note above), point the dashboard at it:
-
-```bash
-REACT_APP_BACKEND_URL=http://localhost:5050/graph npm start
-```
+To work on the frontend itself, see [`dashboard/README.md`](dashboard/README.md).
 
 The dashboard was originally published by BioLib as `openprotein-dashboard` under the MIT license and is vendored here because the original repository is no longer online.
 
