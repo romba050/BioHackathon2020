@@ -4,7 +4,6 @@ A PyTorch framework for tertiary protein structure prediction.
 
 ![Demo](demo.gif)
 
-
 ## Getting started
 
 You need [uv](https://docs.astral.sh/uv/) for the Python side and Node.js for the dashboard frontend.
