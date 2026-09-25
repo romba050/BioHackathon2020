@@ -13,11 +13,11 @@ You need [uv](https://docs.astral.sh/uv/) for the Python side and Node.js for th
 git clone https://github.com/romba050/BioHackathon2020.git
 cd BioHackathon2020
 make setup      # uv sync: installs Python 3.11/3.12 if needed and the pinned dependencies
-make dashboard  # builds the live dashboard frontend, only needed once
+make dashboard  # builds the live dashboard frontend, only needed once (nothing starts yet)
 make run        # trains the sample experiment
 ```
 
-Training prints the dashboard URL as it starts. Open it in a browser to watch the model learn:
+`make dashboard` only compiles the frontend; ignore the deployment hints it prints. The training process serves the dashboard itself. Training prints the URL as it starts, so open that in a browser to watch the model learn:
 
 ```
 $ make run
