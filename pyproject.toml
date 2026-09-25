@@ -1,0 +1,33 @@
+[project]
+name = "openprotein"
+version = "0.1.0"
+description = "A PyTorch framework for tertiary protein structure prediction."
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.11,<3.13"
+dependencies = [
+    "torch>=2.2",
+    "torchvision>=0.17",
+    "numpy>=1.26",
+    "flask>=3.0",
+    "flask-cors>=4.0",
+    "h5py>=3.10",
+    "peptidebuilder>=1.1",
+    "biopython>=1.83",
+    "requests>=2.31",
+]
+
+[dependency-groups]
+dev = [
+    "pylint>=3.0",
+    "pytest>=8.0",
+    "pytest-ordering>=0.6",
+    "onnx>=1.15",
+]
+
+[tool.uv]
+package = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]

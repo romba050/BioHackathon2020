@@ -8,6 +8,7 @@ import time
 import numpy as np
 import requests
 import torch.optim as optim
+from dashboard import DASHBOARD_URL
 from util import set_experiment_id, write_out, write_model_to_disk, write_result_summary
 
 
@@ -43,10 +44,10 @@ def train_model(data_set_identifier, model, train_loader, validation_loader,
             minibatches_proccesed += 1
             start_compute_loss = time.time()
             loss = model.compute_loss(training_minibatch)
-            write_out("Train loss:", float(loss))
+            write_out("Train loss:", loss.item())
             start_compute_grad = time.time()
             loss.backward()
-            loss_tracker = np.append(loss_tracker, float(loss))
+            loss_tracker = np.append(loss_tracker, loss.item())
             end = time.time()
             write_out("Loss time:", start_compute_grad - start_compute_loss, "Grad time:",
                       end - start_compute_grad)
@@ -86,7 +87,7 @@ def train_model(data_set_identifier, model, train_loader, validation_loader,
                 if not hide_ui:
                     write_out("Updating monitoring service:", str(json_data)
                               if len(str(json_data)) < 50 else str(json_data)[:50]+"...")
-                    res = requests.post('http://localhost:5000/graph', json=json_data)
+                    res = requests.post(DASHBOARD_URL, json=json_data, timeout=10)
                     if res.ok:
                         write_out("Received response from monitoring service:", res.json())
 

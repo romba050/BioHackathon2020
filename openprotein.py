@@ -132,7 +132,7 @@ class BaseModel(nn.Module):
 
                 end = time.time()
             write_out("Calculate validation loss for minibatch took:", end - start)
-        loss /= data_loader.dataset.__len__()
+        loss = float(loss) / len(data_loader.dataset)
         self.historical_rmsd_avg_values.append(float(torch.Tensor(RMSD_list).mean()))
         self.historical_drmsd_avg_values.append(float(torch.Tensor(dRMSD_list).mean()))
 
